@@ -40,17 +40,21 @@ if button:
                 with st.spinner("AI is generating your quizzes..."):    
                     st.subheader(f"Your {dif} level {sub} quiz is ready!")
                     questions = generate_quiz(sub,dif)
+                    
+                    with st.form("quiz_form"):
+                        for q in questions:
+                            st.markdown(f"**{q['id']}. {q['question']}**")
 
-                    for q in questions:
-                        st.markdown(f"**{q['id']}. {q['question']}**")
-                        st.radio(
-                            label="Choose the **Right** option",
-                            options=list(q['options'].keys()),
-                            format_func=lambda k: f"{k}. {q['options'][k]}",
-                            key=f"q_{q['id']}",
-                            index=None
-                        )
-                        st.divider()
+                            st.radio(
+                                "Choose:",
+                                options=list(q['options'].keys()),
+                                format_func=lambda k: f"{k}. {q['options'][k]}",
+                                key=f"q_{q['id']}",
+                                index=None
+                            )
+                        
+                        st.write("\n")
+                        submitted_button= st.form_submit_button("Submit",type="primary")
                         
             with right:
                 st.subheader("⏱ Time Left")
