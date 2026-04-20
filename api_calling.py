@@ -1,4 +1,4 @@
-import os
+import os ,json
 from groq import Groq
 from dotenv import load_dotenv
 
@@ -12,55 +12,33 @@ def generate_quiz(subject,difficulty):
     prompt = f"""
             You are an expert GRE exam question generator.
 
-            Generate MULTIPLE GRE-level questions.
+            Generate exactly 4 GRE-level multiple choice questions.
 
-            STRICT REQUIREMENTS:
-            - Subject: {subject}
-            - Difficulty: {difficulty}
-            - Questions MUST be from official GRE syllabus areas
-            - Include different question types within the subject
-            - Ensure exam-standard quality
+            Subject: {subject}
+            Difficulty: {difficulty}
 
-            For English:
-            - Reading comprehension
-            - Vocabulary in context
-            - Sentence equivalence
-            - Text completion
+            For English: reading comprehension, vocabulary in context, sentence equivalence, text completion.
+            For Math: algebra, arithmetic, geometry, data interpretation.
 
-            For Math:
-            - Algebra
-            - Arithmetic
-            - Geometry
-            - Data interpretation
+            Return ONLY a valid JSON array. No explanation, no extra text, no markdown code fences.
 
-            OUTPUT FORMAT (STRICT):
+            Use exactly this structure:
+            [
+            {{
+                "id": 1,
+                "question": "...",
+                "options": {{"A": "...", "B": "...", "C": "...", "D": "..."}},
+                "answer": "B",
+                "explanation": "..."
+            }}
+            ]
 
-            Question 1:
-            <question>
-
-            Options:
-            A. ...
-            B. ...
-            C. ...
-            D. ...
-
-            Question 2:
-            <question>
-
-            Options:
-            A. ...
-            B. ...
-            C. ...
-            D. ...
-
-            (Generate 3 to 5 questions)
-
-            IMPORTANT RULES:
-            - DO NOT provide answers
-            - DO NOT provide explanations
+            Rules:
+            - "answer" must be only a single letter: A, B, C, or D
             - Each question must have exactly one correct answer
-            - Vary difficulty within selected level
-            - Make questions exam-realistic and non-repetitive
+            - "explanation" should be 1-2 sentences max
+            - Questions must be exam-realistic and non-repetitive
+            - Vary question types within the subject
             """
     
     response = client.chat.completions.create(
@@ -72,4 +50,5 @@ def generate_quiz(subject,difficulty):
             }
         ]
     )
-    return response.choices[0].message.content
+    output = response.choices[0].message.content.strip()
+    return json.loads(output)

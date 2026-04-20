@@ -35,11 +35,23 @@ if button:
     if not has_error:
         with st.container(border=True):
             left, right = st.columns([3, 1])
+            
             with left:
                 with st.spinner("AI is generating your quizzes..."):    
                     st.subheader(f"Your {dif} level {sub} quiz is ready!")
                     questions = generate_quiz(sub,dif)
-                    st.markdown(questions)
+
+                    for q in questions:
+                        st.markdown(f"**{q['id']}. {q['question']}**")
+                        st.radio(
+                            label="Choose the **Right** option",
+                            options=list(q['options'].keys()),
+                            format_func=lambda k: f"{k}. {q['options'][k]}",
+                            key=f"q_{q['id']}",
+                            index=None
+                        )
+                        st.divider()
+                        
             with right:
                 st.subheader("⏱ Time Left")
 
@@ -67,3 +79,4 @@ if button:
                     )
 
                     time.sleep(1)
+                    
